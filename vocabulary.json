@@ -1,0 +1,29 @@
+{
+  "Woche_1":{
+    "table":["Tabelle"],
+    "need":["brauche","benötigen"],
+    "guitar":["Gitarre"],
+    "beach":["Strand"],
+    "outside":["draußen","nach draußen"],
+    "inside":["drinnen","nach drinnen"],
+    "jump":["Sprung"],
+    "letter":["Brief"]
+  },
+  "Woche_2":{
+    "finish":["etwas beenden","mit etwas fertig werden"],
+    "Come on":["Na los","Komm"],
+    "How are you?":["Wie geht´s?","Wie geht es dir?"],
+    "Listen, Justin":["Hör zu, Justin"],
+    "(to) listen":["zuhören","horchen"],
+    "much":["viel"],
+    "job":["Job"],
+    "studio":["Studio"],
+    "programme":["Programm","Sendung"],
+    "What programmes...?":["Welche Sendungen?"],
+    "later":["später"],
+    "midnight":["Mitternacht"],
+    "too late":["zu spät"],
+    "get up":["aufstehen"],
+  },
+}
+  
