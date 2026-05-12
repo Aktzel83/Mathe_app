@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>1x1 Meister</title>
+    <style>
+        body { font-family: sans-serif; text-align: center; background-color: #f0f8ff; padding: 50px; }
+        .card { background: white; padding: 20px; border-radius: 15px; box-shadow: 0 4px 8px rgba(0,0,0,0.1); display: inline-block; }
+        h1 { color: #2c3e50; }
+        #aufgabe { font-size: 3rem; margin: 20px 0; color: #e67e22; }
+        input { font-size: 2rem; width: 100px; text-align: center; border: 2px solid #3498db; border-radius: 5px; }
+        button { font-size: 1.5rem; padding: 10px 20px; background: #27ae60; color: white; border: none; border-radius: 5px; cursor: pointer; }
+        #feedback { margin-top: 20px; font-size: 1.2rem; font-weight: bold; }
+    </style>
+</head>
+<body>
+
+<div class="card">
+    <h1>1x1 Trainer 🧠</h1>
+    <div id="aufgabe">Lade...</div>
+    <input type="number" id="antwort" placeholder="?">
+    <br><br>
+    <button onclick="pruefeAntwort()">Check!</button>
+    <div id="feedback"></div>
+</div>
+
+<script>
+    let zahl1, zahl2, ergebnis;
+
+    function neueAufgabe() {
+        zahl1 = Math.floor(Math.random() * 10) + 1;
+        zahl2 = Math.floor(Math.random() * 10) + 1;
+        ergebnis = zahl1 * zahl2;
+        document.getElementById('aufgabe').innerText = `${zahl1} × ${zahl2}`;
+        document.getElementById('antwort').value = '';
+        document.getElementById('feedback').innerText = '';
+    }
+
+    function pruefeAntwort() {
+        const userAntwort = parseInt(document.getElementById('antwort').value);
+        const feedback = document.getElementById('feedback');
+        
+        if (userAntwort === ergebnis) {
+            feedback.innerText = "Richtig! Super gemacht! 🎉";
+            feedback.style.color = "green";
+            setTimeout(neueAufgabe, 1500);
+        } else {
+            feedback.innerText = "Fast! Versuch es nochmal. 💪";
+            feedback.style.color = "red";
+        }
+    }
+
+    // Startet die erste Aufgabe
+    neueAufgabe();
+</script>
+
+</body>
+</html>
