@@ -2,70 +2,171 @@
 <html lang="de">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>1x1 & Geteilt Profi 🏆</title>
-    <style>
-        body { font-family: 'Segoe UI', sans-serif; text-align: center; background-color: #f4f7f6; padding: 20px; }
-        .container { background: white; max-width: 600px; margin: 0 auto; padding: 30px; border-radius: 20px; box-shadow: 0 10px 20px rgba(0,0,0,0.1); }
-        .hidden { display: none; }
-        .row-selection { display: grid; grid-template-columns: repeat(5, 1fr); gap: 10px; margin: 20px 0; }
-        .row-box { border: 1px solid #ddd; padding: 10px; border-radius: 8px; cursor: pointer; }
-        .row-box input { margin-right: 5px; }
-        .op-selection { margin: 20px 0; }
-        #aufgabe { font-size: 4rem; font-weight: bold; color: #2c3e50; margin: 20px 0; }
-        input[type="number"], input[type="text"] { font-size: 1.2rem; padding: 10px; border-radius: 10px; border: 2px solid #3498db; width: 60%; margin-bottom: 10px; text-align: center; }
-        button { font-size: 1.2rem; padding: 12px 24px; background: #27ae60; color: white; border: none; border-radius: 10px; cursor: pointer; }
-        button:hover { background: #219150; }
-        #feedback { font-size: 1.4rem; min-height: 40px; margin-top: 10px; }
-    </style>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Mathe-Held Comic-Edition 🦸‍♂️</title>
+    
+    <!-- Die Verbindung zu deiner separaten CSS-Datei -->
+    <link rel="stylesheet" href="style.css">
 </head>
 <body>
 
 <div class="container">
-    <!-- 1. START: Konfiguration -->
+    <!-- 1. STARTBILDSCHIRM -->
     <div id="start-screen">
-        <h1>Mathe-Trainer 🧠</h1>
+        <h1>Mathe-Held ⚡</h1>
         <input type="text" id="spieler-name" placeholder="Dein Name">
         
-        <h3>Welche Zahlen möchtest du üben?</h3>
+        <h3>Wähle deine Zahlen:</h3>
         <div class="row-selection" id="zahlen-auswahl">
-            <!-- Checkboxen 1-10 -->
+            <!-- Wird per JavaScript gefüllt -->
         </div>
 
-        <h3>Welche Rechenart?</h3>
+        <h3>Rechenart:</h3>
         <div class="op-selection">
             <label><input type="radio" name="operator" value="mal" checked> Mal (×)</label>
             <label><input type="radio" name="operator" value="geteilt"> Geteilt (÷)</label>
             <label><input type="radio" name="operator" value="beides"> Beides</label>
         </div>
 
-        <button onclick="starteQuiz()">Spiel starten! 🚀</button>
+        <button class="num-btn ok-btn" onclick="starteQuiz()" style="width: 100%; margin-top: 20px;">SPIEL STARTEN! 🚀</button>
     </div>
 
-    <!-- 2. QUIZ -->
+    <!-- 2. QUIZ-BEREICH -->
     <div id="quiz-screen" class="hidden">
-        <div id="fortschritt">Frage 1 von 20</div>
-        <div id="aufgabe">?</div>
-        <input type="number" id="antwort" placeholder="Ergebnis">
-        <br>
-        <button onclick="pruefeAntwort()">Check ✅</button>
+        <div id="fortschritt">Aufgabe 1 von 20</div>
+        <div id="aufgabe">? × ?</div>
+        <div id="display"></div>
+        
+        <div class="numpad">
+            <div class="num-btn" onclick="addZahl(1)">1</div>
+            <div class="num-btn" onclick="addZahl(2)">2</div>
+            <div class="num-btn" onclick="addZahl(3)">3</div>
+            <div class="num-btn" onclick="addZahl(4)">4</div>
+            <div class="num-btn" onclick="addZahl(5)">5</div>
+            <div class="num-btn" onclick="addZahl(6)">6</div>
+            <div class="num-btn" onclick="addZahl(7)">7</div>
+            <div class="num-btn" onclick="addZahl(8)">8</div>
+            <div class="num-btn" onclick="addZahl(9)">9</div>
+            <div class="num-btn action-btn" onclick="loesche()">⌫</div>
+            <div class="num-btn" onclick="addZahl(0)">0</div>
+            <div class="num-btn ok-btn" onclick="pruefeAntwort()">OK</div>
+        </div>
         <div id="feedback"></div>
     </div>
 
-    <!-- 3. ENDE -->
+    <!-- 3. ENDERGEBNIS -->
     <div id="end-screen" class="hidden">
-        <h1>Fertig, <span id="ende-name"></span>! 🎉</h1>
+        <h1>BÄÄÄM! 🎉</h1>
         <p id="ergebnis-text"></p>
-        <button onclick="location.reload()">Nochmal starten 🔄</button>
+        <button class="num-btn ok-btn" onclick="location.reload()" style="width: 100%;">NOCHMAL! 🔄</button>
     </div>
 </div>
 
 <script>
     let name, gewaehlteZahlen = [], modus, runde = 1, score = 0, richtigesErgebnis;
+    let aktuelleEingabe = "";
 
-    // Erstellt die Checkboxen beim Laden
+    // Erstellt die Zahlen-Buttons im Startmenü
     const auswahlDiv = document.getElementById('zahlen-auswahl');
     for (let i = 1; i <= 10; i++) {
+        auswahlDiv.innerHTML += `
+            <label class="row-box">
+                <input type="checkbox" value="${i}" checked style="display:none"> ${i}
+            </label>`;
+    }
+
+    // Macht die Zahlen-Buttons im Menü klickbar
+    document.querySelectorAll('.row-box').forEach(box => {
+        box.addEventListener('click', function() {
+            const cb = this.querySelector('input');
+            cb.checked = !cb.checked;
+            this.style.background = cb.checked ? '#2196f3' : '#eee';
+            this.style.color = cb.checked ? 'white' : 'black';
+        });
+        // Initial-Farbe setzen
+        box.style.background = '#2196f3';
+        box.style.color = 'white';
+    });
+
+    function addZahl(z) {
+        if (aktuelleEingabe.length < 4) {
+            aktuelleEingabe += z;
+            document.getElementById('display').innerText = aktuelleEingabe;
+        }
+    }
+
+    function loesche() {
+        aktuelleEingabe = aktuelleEingabe.slice(0, -1);
+        document.getElementById('display').innerText = aktuelleEingabe;
+    }
+
+    function starteQuiz() {
+        name = document.getElementById('spieler-name').value || "Held";
+        modus = document.querySelector('input[name="operator"]:checked').value;
+        const checkboxes = document.querySelectorAll('#zahlen-auswahl input:checked');
+        gewaehlteZahlen = Array.from(checkboxes).map(cb => parseInt(cb.value));
+
+        if (gewaehlteZahlen.length === 0) {
+            alert("Wähle mindestens eine Zahl aus! 😉");
+            return;
+        }
+
+        document.getElementById('start-screen').classList.add('hidden');
+        document.getElementById('quiz-screen').classList.remove('hidden');
+        neueAufgabe();
+    }
+
+    function neueAufgabe() {
+        if (runde > 20) return zeigeEnde();
+        
+        aktuelleEingabe = "";
+        document.getElementById('display').innerText = "";
+        document.getElementById('feedback').innerText = "";
+        document.getElementById('fortschritt').innerText = `AUFGABE ${runde} / 20`;
+        
+        const z1 = gewaehlteZahlen[Math.floor(Math.random() * gewaehlteZahlen.length)];
+        const z2 = Math.floor(Math.random() * 10) + 1;
+        
+        let op = modus;
+        if (modus === 'beides') op = Math.random() > 0.5 ? 'mal' : 'geteilt';
+
+        if (op === 'mal') {
+            richtigesErgebnis = z1 * z2;
+            document.getElementById('aufgabe').innerText = `${z1} × ${z2}`;
+        } else {
+            richtigesErgebnis = z2;
+            document.getElementById('aufgabe').innerText = `${z1 * z2} ÷ ${z1}`;
+        }
+    }
+
+    function pruefeAntwort() {
+        if (aktuelleEingabe === "") return;
+        const userAntwort = parseInt(aktuelleEingabe);
+        const fb = document.getElementById('feedback');
+
+        if (userAntwort === richtigesErgebnis) {
+            score++;
+            fb.innerText = "RICHTIG! 🔥";
+            fb.style.color = "#4caf50";
+        } else {
+            fb.innerText = `UPS! ES WAR ${richtigesErgebnis} 💡`;
+            fb.style.color = "#ff4081";
+        }
+
+        runde++;
+        setTimeout(neueAufgabe, 1200);
+    }
+
+    function zeigeEnde() {
+        document.getElementById('quiz-screen').classList.add('hidden');
+        document.getElementById('end-screen').classList.remove('hidden');
+        document.getElementById('ergebnis-text').innerHTML = 
+            `STARKER AUFTRITT, <b>${name}</b>!<br>Du hast <b>${score} von 20</b> RICHTIG!`;
+    }
+</script>
+
+</body>
+</html>    for (let i = 1; i <= 10; i++) {
         auswahlDiv.innerHTML += `
             <label class="row-box">
                 <input type="checkbox" value="${i}" checked> ${i}er
