@@ -137,7 +137,7 @@
 
     async function starteTraining() {
         try {
-            const response = await fetch('vokabeln.json?v=' + Date.now());
+            const response = await fetch('vocabulary.json?v=' + Date.now());
             if (!response.ok) throw new Error("Datei nicht gefunden");
             
             alleDaten = await response.json();
