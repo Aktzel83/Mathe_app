@@ -137,6 +137,7 @@
 
     async function starteTraining() {
         try {
+            // Check hier den Dateinamen (vocabulary.json oder vokabeln.json)
             const response = await fetch('vocabulary.json?v=' + Date.now());
             if (!response.ok) throw new Error("Datei nicht gefunden");
             
@@ -166,14 +167,14 @@
         const alteWochenKeys = wochen.slice(0, -1);
 
         let stapel = [];
-        fehlerListe = []; // Fehler zurücksetzen
+        fehlerListe = []; 
+        aktuellerIndex = 0;
+        score = 0;
 
-        // 1. Alle aus dem neuesten Block
         for (let en in alleDaten[neuesteWocheKey]) {
             stapel.push({ en: en, de: alleDaten[neuesteWocheKey][en], woche: neuesteWocheKey });
         }
 
-        // 2. Ca. 8 zufällige aus den alten Blöcken
         let altePool = [];
         alteWochenKeys.forEach(w => {
             for (let en in alleDaten[w]) {
@@ -241,7 +242,6 @@
         } else {
             fb.innerText = `LÖSUNG: ${loesung}`;
             fb.style.color = "var(--comic-pink)";
-            // Fehler speichern
             fehlerListe.push({ frage: frageText, antwort: loesung });
         }
 
@@ -274,172 +274,6 @@
         }
         
         document.getElementById('ergebnis-text').innerHTML = html;
-    }
-</script>
-</body>
-</html>        <button class="num-btn ok-btn btn-full" onclick="starteTraining()">STARTEN! 🚀</button>
-        <button class="num-btn action-btn btn-full" onclick="window.location.href='index.html'" style="font-size: 1.2rem;">ZURÜCK 🏠</button>
-    </div>
-
-    <!-- 2. QUIZ-BEREICH -->
-    <div id="quiz-screen" class="hidden">
-        <div id="fortschritt">Wird geladen...</div>
-        <div id="aufgabe">...</div>
-        
-        <input type="text" id="antwort-input" placeholder="Antwort tippen..." autocomplete="off">
-        
-        <button class="num-btn ok-btn btn-full" onclick="pruefeAntwort()">PRÜFEN! ✅</button>
-        <button class="num-btn action-btn btn-full" onclick="abbruch()" style="font-size: 1.2rem; background-color: var(--comic-pink);">ABBRECHEN ❌</button>
-        
-        <div id="feedback"></div>
-    </div>
-
-    <!-- 3. ENDERGEBNIS -->
-    <div id="end-screen" class="hidden">
-        <h1>BÄÄÄM! 🎉</h1>
-        <p id="ergebnis-text"></p>
-        <button class="num-btn ok-btn btn-full" onclick="location.reload()">NOCHMAL 🔄</button>
-        <button class="num-btn btn-full" onclick="window.location.href='index.html'" style="background: var(--comic-blue); color: white;">HAUPTMENÜ 🏠</button>
-    </div>
-</div>
-
-<script>
-    let alleDaten = {};
-    let lernStapel = [];
-    let aktuellerIndex = 0;
-    let score = 0;
-    let modus = "";
-
-    // "Enter" Taste zum Prüfen aktivieren
-    document.getElementById('antwort-input').addEventListener('keypress', function (e) {
-        if (e.key === 'Enter') {
-            pruefeAntwort();
-        }
-    });
-
-    async function starteTraining() {
-        try {
-            const response = await fetch('vocabulary.json?v=' + Date.now());
-            if (!response.ok) throw new Error("Datei nicht gefunden");
-            
-            alleDaten = await response.json();
-            modus = document.getElementById('sprach-modus').value;
-            
-            erstelleLernstapel();
-            
-            if (lernStapel.length === 0) {
-                alert("Keine Vokabeln gefunden!");
-                return;
-            }
-
-            document.getElementById('start-screen').classList.add('hidden');
-            document.getElementById('quiz-screen').classList.remove('hidden');
-            zeigeVokabel();
-        } catch (e) {
-            alert("Fehler beim Laden: " + e.message);
-        }
-    }
-
-    function erstelleLernstapel() {
-        const wochen = Object.keys(alleDaten);
-        if (wochen.length === 0) return;
-
-        const neuesteWocheKey = wochen[wochen.length - 1];
-        const alteWochenKeys = wochen.slice(0, -1);
-
-        let stapel = [];
-
-        // 1. Alle aus dem neuesten Block
-        for (let en in alleDaten[neuesteWocheKey]) {
-            stapel.push({ en: en, de: alleDaten[neuesteWocheKey][en], woche: neuesteWocheKey });
-        }
-
-        // 2. Ca. 8 zufällige aus den alten Blöcken
-        let altePool = [];
-        alteWochenKeys.forEach(w => {
-            for (let en in alleDaten[w]) {
-                altePool.push({ en: en, de: alleDaten[w][en], woche: w });
-            }
-        });
-
-        altePool.sort(() => Math.random() - 0.5);
-        const auswahlAlt = altePool.slice(0, 8);
-        
-        stapel = stapel.concat(auswahlAlt);
-        stapel.sort(() => Math.random() - 0.5); // Alles durchmischen
-        lernStapel = stapel;
-    }
-
-    function zeigeVokabel() {
-        if (aktuellerIndex >= lernStapel.length) return zeigeEnde();
-        
-        const vokabel = lernStapel[aktuellerIndex];
-        const anzeige = document.getElementById('aufgabe');
-        const input = document.getElementById('antwort-input');
-        
-        input.value = "";
-        input.focus();
-        document.getElementById('feedback').innerText = "";
-        document.getElementById('fortschritt').innerText = `WORT ${aktuellerIndex + 1} / ${lernStapel.length} (${vokabel.woche})`;
-
-        let richtung = modus;
-        if (modus === "mix") richtung = Math.random() > 0.5 ? "en_de" : "de_en";
-
-        if (richtung === "en_de") {
-            anzeige.innerText = vokabel.en;
-            anzeige.dataset.ziel = "de";
-        } else {
-            // Zeige eine der deutschen Varianten als Frage
-            anzeige.innerText = vokabel.de[Math.floor(Math.random() * vokabel.de.length)];
-            anzeige.dataset.ziel = "en";
-        }
-    }
-
-    function pruefeAntwort() {
-        const inputField = document.getElementById('antwort-input');
-        const input = inputField.value.trim().toLowerCase();
-        if (input === "" || document.getElementById('quiz-screen').classList.contains('hidden')) return;
-
-        const vokabel = lernStapel[aktuellerIndex];
-        const ziel = document.getElementById('aufgabe').dataset.ziel;
-        const fb = document.getElementById('feedback');
-        
-        let korrekt = false;
-        let loesung = "";
-
-        if (ziel === "de") {
-            korrekt = vokabel.de.some(d => d.toLowerCase() === input);
-            loesung = vokabel.de.join(", ");
-        } else {
-            korrekt = vokabel.en.toLowerCase() === input;
-            loesung = vokabel.en;
-        }
-
-        if (korrekt) {
-            score++;
-            fb.innerText = "RICHTIG! 🌟";
-            fb.style.color = "var(--comic-green)";
-        } else {
-            fb.innerText = `LÖSUNG: ${loesung}`;
-            fb.style.color = "var(--comic-pink)";
-        }
-
-        aktuellerIndex++;
-        setTimeout(zeigeVokabel, 2000);
-    }
-
-    function abbruch() {
-        if (confirm("Abbrechen und zurück zum Hauptmenü?")) {
-            window.location.href = 'index.html';
-        }
-    }
-
-    function zeigeEnde() {
-        document.getElementById('quiz-screen').classList.add('hidden');
-        document.getElementById('end-screen').classList.remove('hidden');
-        const name = document.getElementById('spieler-name').value || "Held";
-        document.getElementById('ergebnis-text').innerHTML = 
-            `STARK, <b>${name}</b>!<br>Ergebnis: <b>${score} von ${lernStapel.length}</b>`;
     }
 </script>
 </body>
