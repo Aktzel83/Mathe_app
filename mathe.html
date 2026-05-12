@@ -5,6 +5,15 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Mathe-Held Comic-Edition 🦸‍♂️</title>
     <link rel="stylesheet" href="style.css">
+    <style>
+        /* Zusätzlicher Style für den Abbruch-Button im Mathe-Numpad */
+        .btn-full {
+            width: 100%;
+            margin-top: 15px;
+            font-size: 1.2rem;
+            padding: 15px;
+        }
+    </style>
 </head>
 <body>
 
@@ -27,6 +36,8 @@
         </div>
 
         <button class="num-btn ok-btn" onclick="starteQuiz()" style="width: 100%; margin-top: 20px;">SPIEL STARTEN! 🚀</button>
+        <!-- Zurück-Button im Hauptmenü -->
+        <button class="num-btn action-btn btn-full" onclick="window.location.href='index.html'">ZURÜCK 🏠</button>
     </div>
 
     <!-- 2. QUIZ-BEREICH -->
@@ -35,25 +46,25 @@
         <div id="aufgabe">? × ?</div>
         <div id="display"></div>
         
-        <!-- Numpad wie Handy angeordnet -->
+        <!-- Numpad -->
         <div class="numpad">
-            <!-- Reihe 1 -->
             <div class="num-btn" onclick="addZahl(1)">1</div>
             <div class="num-btn" onclick="addZahl(2)">2</div>
             <div class="num-btn" onclick="addZahl(3)">3</div>
-            <!-- Reihe 2 -->
             <div class="num-btn" onclick="addZahl(4)">4</div>
             <div class="num-btn" onclick="addZahl(5)">5</div>
             <div class="num-btn" onclick="addZahl(6)">6</div>
-            <!-- Reihe 3 -->
             <div class="num-btn" onclick="addZahl(7)">7</div>
             <div class="num-btn" onclick="addZahl(8)">8</div>
             <div class="num-btn" onclick="addZahl(9)">9</div>
-            <!-- Reihe 4 -->
             <div class="num-btn action-btn" onclick="loesche()">⌫</div>
             <div class="num-btn" onclick="addZahl(0)">0</div>
             <div class="num-btn ok-btn" onclick="pruefeAntwort()">OK</div>
         </div>
+
+        <!-- ABBRUCH BUTTON UNTER DEM NUMPAD -->
+        <button class="num-btn action-btn btn-full" onclick="abbruch()" style="background-color: var(--comic-pink);">ABBRECHEN ❌</button>
+        
         <div id="feedback"></div>
     </div>
 
@@ -62,10 +73,121 @@
         <h1>BÄÄÄM! 🎉</h1>
         <p id="ergebnis-text"></p>
         <button class="num-btn ok-btn" onclick="location.reload()" style="width: 100%;">NOCHMAL! 🔄</button>
+        <button class="num-btn btn-full" onclick="window.location.href='index.html'" style="background: var(--comic-blue); color: white;">HAUPTMENÜ 🏠</button>
     </div>
 </div>
 
 <script>
+    let name, gewaehlteZahlen = [], modus, runde = 1, score = 0, richtigesErgebnis;
+    let aktuelleEingabe = "";
+
+    // Erstellt die Zahlen-Buttons im Startmenü
+    const auswahlDiv = document.getElementById('zahlen-auswahl');
+    for (let i = 1; i <= 10; i++) {
+        auswahlDiv.innerHTML += `
+            <label class="row-box">
+                <input type="checkbox" value="${i}" checked style="display:none"> ${i}
+            </label>`;
+    }
+
+    // Macht die Zahlen-Buttons im Menü klickbar
+    document.querySelectorAll('.row-box').forEach(box => {
+        box.addEventListener('click', function() {
+            const cb = this.querySelector('input');
+            cb.checked = !cb.checked;
+            this.style.background = cb.checked ? '#2196f3' : '#eee';
+            this.style.color = cb.checked ? 'white' : 'black';
+        });
+        box.style.background = '#2196f3';
+        box.style.color = 'white';
+    });
+
+    function addZahl(z) {
+        if (aktuelleEingabe.length < 4) {
+            aktuelleEingabe += z;
+            document.getElementById('display').innerText = aktuelleEingabe;
+        }
+    }
+
+    function loesche() {
+        aktuelleEingabe = aktuelleEingabe.slice(0, -1);
+        document.getElementById('display').innerText = aktuelleEingabe;
+    }
+
+    function starteQuiz() {
+        name = document.getElementById('spieler-name').value || "Held";
+        modus = document.querySelector('input[name="operator"]:checked').value;
+        const checkboxes = document.querySelectorAll('#zahlen-auswahl input:checked');
+        gewaehlteZahlen = Array.from(checkboxes).map(cb => parseInt(cb.value));
+
+        if (gewaehlteZahlen.length === 0) {
+            alert("Wähle mindestens eine Zahl aus! 😉");
+            return;
+        }
+
+        document.getElementById('start-screen').classList.add('hidden');
+        document.getElementById('quiz-screen').classList.remove('hidden');
+        neueAufgabe();
+    }
+
+    function neueAufgabe() {
+        if (runde > 20) return zeigeEnde();
+        
+        aktuelleEingabe = "";
+        document.getElementById('display').innerText = "";
+        document.getElementById('feedback').innerText = "";
+        document.getElementById('fortschritt').innerText = `AUFGABE ${runde} / 20`;
+        
+        const z1 = gewaehlteZahlen[Math.floor(Math.random() * gewaehlteZahlen.length)];
+        const z2 = Math.floor(Math.random() * 10) + 1;
+        
+        let op = modus;
+        if (modus === 'beides') op = Math.random() > 0.5 ? 'mal' : 'geteilt';
+
+        if (op === 'mal') {
+            richtigesErgebnis = z1 * z2;
+            document.getElementById('aufgabe').innerText = `${z1} × ${z2}`;
+        } else {
+            richtigesErgebnis = z2;
+            document.getElementById('aufgabe').innerText = `${z1 * z2} ÷ ${z1}`;
+        }
+    }
+
+    function pruefeAntwort() {
+        if (aktuelleEingabe === "") return;
+        const userAntwort = parseInt(aktuelleEingabe);
+        const fb = document.getElementById('feedback');
+
+        if (userAntwort === richtigesErgebnis) {
+            score++;
+            fb.innerText = "RICHTIG! 🔥";
+            fb.style.color = "#4caf50";
+        } else {
+            fb.innerText = `UPS! ES WAR ${richtigesErgebnis} 💡`;
+            fb.style.color = "#ff4081";
+        }
+
+        runde++;
+        setTimeout(neueAufgabe, 1200);
+    }
+
+    // NEU: Abbruch-Funktion
+    function abbruch() {
+        if (confirm("Möchtest du das Mathe-Quiz wirklich abbrechen?")) {
+            window.location.href = 'index.html';
+        }
+    }
+
+    function zeigeEnde() {
+        document.getElementById('quiz-screen').classList.add('hidden');
+        document.getElementById('end-screen').classList.remove('hidden');
+        document.getElementById('ergebnis-text').innerHTML = 
+            `STARKER AUFTRITT, <b>${name}</b>!<br>Du hast <b>${score} von 20</b> RICHTIG!`;
+    }
+</script>
+
+</body>
+</html><script>
     let name, gewaehlteZahlen = [], modus, runde = 1, score = 0, richtigesErgebnis;
     let aktuelleEingabe = "";
 
