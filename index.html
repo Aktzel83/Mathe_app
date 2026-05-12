@@ -3,57 +3,139 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>1x1 Meister</title>
+    <title>1x1 & Geteilt Profi 🏆</title>
     <style>
-        body { font-family: sans-serif; text-align: center; background-color: #f0f8ff; padding: 50px; }
-        .card { background: white; padding: 20px; border-radius: 15px; box-shadow: 0 4px 8px rgba(0,0,0,0.1); display: inline-block; }
-        h1 { color: #2c3e50; }
-        #aufgabe { font-size: 3rem; margin: 20px 0; color: #e67e22; }
-        input { font-size: 2rem; width: 100px; text-align: center; border: 2px solid #3498db; border-radius: 5px; }
-        button { font-size: 1.5rem; padding: 10px 20px; background: #27ae60; color: white; border: none; border-radius: 5px; cursor: pointer; }
-        #feedback { margin-top: 20px; font-size: 1.2rem; font-weight: bold; }
+        body { font-family: 'Segoe UI', sans-serif; text-align: center; background-color: #f4f7f6; padding: 20px; }
+        .container { background: white; max-width: 600px; margin: 0 auto; padding: 30px; border-radius: 20px; box-shadow: 0 10px 20px rgba(0,0,0,0.1); }
+        .hidden { display: none; }
+        .row-selection { display: grid; grid-template-columns: repeat(5, 1fr); gap: 10px; margin: 20px 0; }
+        .row-box { border: 1px solid #ddd; padding: 10px; border-radius: 8px; cursor: pointer; }
+        .row-box input { margin-right: 5px; }
+        .op-selection { margin: 20px 0; }
+        #aufgabe { font-size: 4rem; font-weight: bold; color: #2c3e50; margin: 20px 0; }
+        input[type="number"], input[type="text"] { font-size: 1.2rem; padding: 10px; border-radius: 10px; border: 2px solid #3498db; width: 60%; margin-bottom: 10px; text-align: center; }
+        button { font-size: 1.2rem; padding: 12px 24px; background: #27ae60; color: white; border: none; border-radius: 10px; cursor: pointer; }
+        button:hover { background: #219150; }
+        #feedback { font-size: 1.4rem; min-height: 40px; margin-top: 10px; }
     </style>
 </head>
 <body>
 
-<div class="card">
-    <h1>1x1 Trainer 🧠</h1>
-    <div id="aufgabe">Lade...</div>
-    <input type="number" id="antwort" placeholder="?">
-    <br><br>
-    <button onclick="pruefeAntwort()">Check!</button>
-    <div id="feedback"></div>
+<div class="container">
+    <!-- 1. START: Konfiguration -->
+    <div id="start-screen">
+        <h1>Mathe-Trainer 🧠</h1>
+        <input type="text" id="spieler-name" placeholder="Dein Name">
+        
+        <h3>Welche Zahlen möchtest du üben?</h3>
+        <div class="row-selection" id="zahlen-auswahl">
+            <!-- Checkboxen 1-10 -->
+        </div>
+
+        <h3>Welche Rechenart?</h3>
+        <div class="op-selection">
+            <label><input type="radio" name="operator" value="mal" checked> Mal (×)</label>
+            <label><input type="radio" name="operator" value="geteilt"> Geteilt (÷)</label>
+            <label><input type="radio" name="operator" value="beides"> Beides</label>
+        </div>
+
+        <button onclick="starteQuiz()">Spiel starten! 🚀</button>
+    </div>
+
+    <!-- 2. QUIZ -->
+    <div id="quiz-screen" class="hidden">
+        <div id="fortschritt">Frage 1 von 20</div>
+        <div id="aufgabe">?</div>
+        <input type="number" id="antwort" placeholder="Ergebnis">
+        <br>
+        <button onclick="pruefeAntwort()">Check ✅</button>
+        <div id="feedback"></div>
+    </div>
+
+    <!-- 3. ENDE -->
+    <div id="end-screen" class="hidden">
+        <h1>Fertig, <span id="ende-name"></span>! 🎉</h1>
+        <p id="ergebnis-text"></p>
+        <button onclick="location.reload()">Nochmal starten 🔄</button>
+    </div>
 </div>
 
 <script>
-    let zahl1, zahl2, ergebnis;
+    let name, gewaehlteZahlen = [], modus, runde = 1, score = 0, richtigesErgebnis;
+
+    // Erstellt die Checkboxen beim Laden
+    const auswahlDiv = document.getElementById('zahlen-auswahl');
+    for (let i = 1; i <= 10; i++) {
+        auswahlDiv.innerHTML += `
+            <label class="row-box">
+                <input type="checkbox" value="${i}" checked> ${i}er
+            </label>`;
+    }
+
+    function starteQuiz() {
+        name = document.getElementById('spieler-name').value || "Champion";
+        modus = document.querySelector('input[name="operator"]:checked').value;
+        
+        const checkboxes = document.querySelectorAll('#zahlen-auswahl input:checked');
+        gewaehlteZahlen = Array.from(checkboxes).map(cb => parseInt(cb.value));
+
+        if (gewaehlteZahlen.length === 0) {
+            alert("Bitte wähle mindestens eine Zahl zum Üben aus!");
+            return;
+        }
+
+        document.getElementById('start-screen').classList.add('hidden');
+        document.getElementById('quiz-screen').classList.remove('hidden');
+        neueAufgabe();
+    }
 
     function neueAufgabe() {
-        zahl1 = Math.floor(Math.random() * 10) + 1;
-        zahl2 = Math.floor(Math.random() * 10) + 1;
-        ergebnis = zahl1 * zahl2;
-        document.getElementById('aufgabe').innerText = `${zahl1} × ${zahl2}`;
+        if (runde > 20) return zeigeEnde();
+        
+        document.getElementById('fortschritt').innerText = `Frage ${runde} von 20`;
+        const z1 = gewaehlteZahlen[Math.floor(Math.random() * gewaehlteZahlen.length)];
+        const z2 = Math.floor(Math.random() * 10) + 1;
+        
+        let aktuellerModus = modus;
+        if (modus === 'beides') aktuellerModus = Math.random() > 0.5 ? 'mal' : 'geteilt';
+
+        if (aktuellerModus === 'mal') {
+            richtigesErgebnis = z1 * z2;
+            document.getElementById('aufgabe').innerText = `${z1} × ${z2}`;
+        } else {
+            // Für Geteilt: Wir rechnen erst z1 * z2, damit die Division aufgeht
+            let produkt = z1 * z2;
+            richtigesErgebnis = z2; 
+            document.getElementById('aufgabe').innerText = `${produkt} ÷ ${z1}`;
+        }
+
         document.getElementById('antwort').value = '';
-        document.getElementById('feedback').innerText = '';
+        document.getElementById('antwort').focus();
     }
 
     function pruefeAntwort() {
         const userAntwort = parseInt(document.getElementById('antwort').value);
-        const feedback = document.getElementById('feedback');
-        
-        if (userAntwort === ergebnis) {
-            feedback.innerText = "Richtig! Super gemacht! 🎉";
-            feedback.style.color = "green";
-            setTimeout(neueAufgabe, 1500);
+        const fb = document.getElementById('feedback');
+
+        if (userAntwort === richtigesErgebnis) {
+            score++;
+            fb.innerHTML = "Richtig! ✅";
+            fb.style.color = "green";
         } else {
-            feedback.innerText = "Fast! Versuch es nochmal. 💪";
-            feedback.style.color = "red";
+            fb.innerHTML = `Falsch! Lösung: ${richtigesErgebnis} ❌`;
+            fb.style.color = "red";
         }
+
+        runde++;
+        setTimeout(neueAufgabe, 1200);
     }
 
-    // Startet die erste Aufgabe
-    neueAufgabe();
+    function zeigeEnde() {
+        document.getElementById('quiz-screen').classList.add('hidden');
+        document.getElementById('end-screen').classList.remove('hidden');
+        document.getElementById('ende-name').innerText = name;
+        document.getElementById('ergebnis-text').innerText = `Du hast ${score} von 20 Aufgaben richtig gelöst!`;
+    }
 </script>
-
 </body>
 </html>
