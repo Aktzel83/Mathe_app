@@ -1,79 +1,178 @@
-<style>
-    :root {
-        --comic-yellow: #ffeb3b;
-        --comic-blue: #2196f3;
-        --comic-pink: #ff4081;
-        --comic-green: #4caf50;
-        --dark: #212121;
-    }
+:root {
+    --comic-yellow: #ffeb3b;
+    --comic-blue: #2196f3;
+    --comic-pink: #ff4081;
+    --comic-green: #4caf50;
+    --dark: #212121;
+}
 
-    body {
-        font-family: 'Arial Black', sans-serif;
-        background-color: #ffcc00; /* Knallgelber Hintergrund */
-        background-image: radial-gradient(circle, #ffdb4d 20%, transparent 20%), 
-                          radial-gradient(circle, #ffdb4d 20%, transparent 20%);
-        background-size: 40px 40px;
-        background-position: 0 0, 20px 20px;
-        margin: 0;
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        min-height: 100vh;
-    }
+body {
+    font-family: 'Arial Black', sans-serif;
+    background-color: #ffcc00;
+    background-image: radial-gradient(circle, #ffdb4d 20%, transparent 20%), 
+                      radial-gradient(circle, #ffdb4d 20%, transparent 20%);
+    background-size: 40px 40px;
+    background-position: 0 0, 20px 20px;
+    margin: 0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+}
 
-    .container {
-        background: white;
-        width: 90%;
-        max-width: 550px;
-        padding: 30px;
-        border: 6px solid var(--dark); /* Dicke Comic-Umrandung */
-        border-radius: 40px;
-        box-shadow: 12px 12px 0px var(--dark); /* Harter Schatten */
-        text-align: center;
-    }
+.container {
+    background: white;
+    width: 90%;
+    max-width: 550px;
+    padding: 30px;
+    border: 6px solid var(--dark);
+    border-radius: 40px;
+    box-shadow: 12px 12px 0px var(--dark);
+    text-align: center;
+}
 
-    h1 {
-        font-size: 2.5rem;
-        text-transform: uppercase;
-        -webkit-text-stroke: 2px var(--dark);
-        color: var(--comic-blue);
-        text-shadow: 4px 4px 0px var(--comic-yellow);
-        margin-bottom: 20px;
-    }
+h1 {
+    font-size: 2.5rem;
+    text-transform: uppercase;
+    -webkit-text-stroke: 2px var(--dark);
+    color: var(--comic-blue);
+    text-shadow: 4px 4px 0px var(--comic-yellow);
+    margin-bottom: 20px;
+}
 
-    /* Das Nummernfeld im Comic-Stil */
-    .num-btn {
-        background: white;
-        border: 4px solid var(--dark);
-        padding: 20px;
-        font-size: 2.2rem;
-        border-radius: 20px;
-        box-shadow: 0 6px 0 var(--dark);
-        transition: all 0.1s;
-        cursor: pointer;
-    }
+h3 {
+    font-size: 1.3rem;
+    margin: 15px 0 10px 0;
+    color: var(--dark);
+}
 
-    .num-btn:active {
-        transform: translateY(4px);
-        box-shadow: 0 2px 0 var(--dark);
-    }
+input[type="text"] {
+    width: 90%;
+    padding: 12px;
+    font-size: 1.1rem;
+    border: 3px solid var(--dark);
+    border-radius: 15px;
+    margin-bottom: 15px;
+    font-family: 'Arial Black', sans-serif;
+}
 
-    .action-btn { background: var(--comic-pink); color: white; }
-    .ok-btn { background: var(--comic-green); color: white; grid-column: span 1; }
+.row-selection {
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    gap: 8px;
+    margin-bottom: 20px;
+}
 
-    #aufgabe {
-        font-size: 5.5rem;
-        color: var(--dark);
-        margin: 10px 0;
-        background: #f0f0f0;
-        border-radius: 20px;
-        border: 4px dashed var(--dark);
-    }
+.row-box {
+    background: #2196f3;
+    color: white;
+    padding: 12px 8px;
+    border: 3px solid var(--dark);
+    border-radius: 12px;
+    font-weight: bold;
+    cursor: pointer;
+    transition: all 0.2s;
+    font-size: 0.95rem;
+}
 
-    #display {
-        font-size: 3.5rem;
-        margin-bottom: 15px;
-        color: var(--comic-blue);
-        height: 1.2em;
-    }
-</style>
+.row-box:hover {
+    transform: scale(1.05);
+}
+
+.op-selection {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    margin-bottom: 20px;
+}
+
+.op-selection label {
+    font-size: 1rem;
+    cursor: pointer;
+    margin: 0;
+}
+
+.num-btn {
+    background: white;
+    border: 4px solid var(--dark);
+    padding: 20px;
+    font-size: 2.2rem;
+    border-radius: 20px;
+    box-shadow: 0 6px 0 var(--dark);
+    transition: all 0.1s;
+    cursor: pointer;
+    font-weight: bold;
+}
+
+.num-btn:active {
+    transform: translateY(4px);
+    box-shadow: 0 2px 0 var(--dark);
+}
+
+.action-btn {
+    background: var(--comic-pink);
+    color: white;
+}
+
+.ok-btn {
+    background: var(--comic-green);
+    color: white;
+}
+
+.numpad {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 10px;
+    margin: 20px 0;
+}
+
+#fortschritt {
+    font-size: 1.2rem;
+    font-weight: bold;
+    color: var(--dark);
+    margin-bottom: 20px;
+    background: #fff3cd;
+    padding: 10px;
+    border-radius: 10px;
+}
+
+#aufgabe {
+    font-size: 5.5rem;
+    color: var(--dark);
+    margin: 20px 0;
+    background: #f0f0f0;
+    border-radius: 20px;
+    border: 4px dashed var(--dark);
+    padding: 20px;
+}
+
+#display {
+    font-size: 3.5rem;
+    margin-bottom: 15px;
+    color: var(--comic-blue);
+    height: 1.2em;
+    font-weight: bold;
+}
+
+#feedback {
+    font-size: 1.5rem;
+    font-weight: bold;
+    margin-top: 15px;
+    height: 2em;
+}
+
+#end-screen h1 {
+    font-size: 3rem;
+    margin-bottom: 30px;
+}
+
+#ergebnis-text {
+    font-size: 1.5rem;
+    color: var(--dark);
+    margin-bottom: 30px;
+    line-height: 1.6;
+}
+
+.hidden {
+    display: none !important;
+}
