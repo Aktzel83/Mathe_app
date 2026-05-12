@@ -1,1 +1,159 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Vokabel-Held 🦸‍♂️</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
 
+<div class="container">
+    <!-- STARTMENÜ -->
+    <div id="start-screen">
+        <h1>Vokabel-Held ✍️</h1>
+        <input type="text" id="spieler-name" placeholder="Dein Name">
+        
+        <h3>Modus wählen:</h3>
+        <select id="sprach-modus">
+            <option value="en_de">Englisch ➔ Deutsch</option>
+            <option value="de_en">Deutsch ➔ Englisch</option>
+            <option value="mix">Gemixt 🔄</option>
+        </select>
+
+        <button class="num-btn ok-btn" onclick="starteTraining()" style="width: 100%; margin-top: 20px;">LERNEN STARTEN! 🚀</button>
+    </div>
+
+    <!-- QUIZ-BEREICH -->
+    <div id="quiz-screen" class="hidden">
+        <div id="fortschritt">Wort 1 / ?</div>
+        <div id="vokabel-frage">...</div>
+        <input type="text" id="antwort-input" placeholder="Deine Antwort..." autocomplete="off">
+        <button class="num-btn ok-btn" onclick="pruefeAntwort()" id="check-btn">PRÜFEN</button>
+        <div id="feedback"></div>
+    </div>
+
+    <!-- ERGEBNIS -->
+    <div id="end-screen" class="hidden">
+        <h1>BÄÄÄM! 🎉</h1>
+        <p id="ergebnis-text"></p>
+        <button class="num-btn ok-btn" onclick="location.reload()" style="width: 100%;">NOCHMAL! 🔄</button>
+    </div>
+</div>
+
+<script>
+    let alleDaten = {};
+    let lernStapel = [];
+    let aktuellerIndex = 0;
+    let score = 0;
+    let modus = "";
+
+    async function starteTraining() {
+        const response = await fetch('vokabeln.json');
+        alleDaten = await response.json();
+        
+        const name = document.getElementById('spieler-name').value || "Held";
+        modus = document.getElementById('sprach-modus').value;
+        
+        erstelleLernstapel();
+        
+        document.getElementById('start-screen').classList.add('hidden');
+        document.getElementById('quiz-screen').classList.remove('hidden');
+        zeigeVokabel();
+    }
+
+    function erstelleLernstapel() {
+        const wochen = Object.keys(alleDaten);
+        const neuesteWocheKey = wochen[wochen.length - 1];
+        const alteWochenKeys = wochen.slice(0, -1);
+
+        let stapel = [];
+
+        // 1. ALLE aus der neuesten Woche hinzufügen
+        for (let en in alleDaten[neuesteWocheKey]) {
+            stapel.push({ en: en, de: alleDaten[neuesteWocheKey][en], woche: neuesteWocheKey });
+        }
+
+        // 2. 5-10 zufällige aus allen alten Wochen
+        let alleAltenVokabeln = [];
+        alteWochenKeys.forEach(w => {
+            for (let en in alleDaten[w]) {
+                alleAltenVokabeln.push({ en: en, de: alleDaten[w][en], woche: w });
+            }
+        });
+
+        // Mische die alten und nimm max. 10
+        alleAltenVokabeln.sort(() => Math.random() - 0.5);
+        const auswahlAlt = alleAltenVokabeln.slice(0, 10);
+        
+        stapel = stapel.concat(auswahlAlt);
+
+        // 3. Den gesamten Stapel mischen
+        stapel.sort(() => Math.random() - 0.5);
+        lernStapel = stapel;
+    }
+
+    function zeigeVokabel() {
+        if (aktuellerIndex >= lernStapel.length) return zeigeEnde();
+        
+        const vokabel = lernStapel[aktuellerIndex];
+        const anzeige = document.getElementById('vokabel-frage');
+        const input = document.getElementById('antwort-input');
+        const fortschritt = document.getElementById('fortschritt');
+        
+        input.value = "";
+        document.getElementById('feedback').innerText = "";
+        fortschritt.innerText = `Wort ${aktuellerIndex + 1} von ${lernStapel.length} (${vokabel.woche})`;
+
+        // Sprach-Logik
+        let aktuelleRichtung = modus;
+        if (modus === "mix") aktuelleRichtung = Math.random() > 0.5 ? "en_de" : "de_en";
+
+        if (aktuelleRichtung === "en_de") {
+            anzeige.innerText = vokabel.en;
+            anzeige.dataset.ziel = "de";
+        } else {
+            anzeige.innerText = vokabel.de[0]; // Erstes deutsches Wort zeigen
+            anzeige.dataset.ziel = "en";
+        }
+    }
+
+    function pruefeAntwort() {
+        const input = document.getElementById('antwort-input').value.trim().toLowerCase();
+        const vokabel = lernStapel[aktuellerIndex];
+        const ziel = document.getElementById('vokabel-frage').dataset.ziel;
+        const fb = document.getElementById('feedback');
+        
+        let korrekt = false;
+        let loesung = "";
+
+        if (ziel === "de") {
+            korrekt = vokabel.de.some(d => d.toLowerCase() === input);
+            loesung = vokabel.de.join(", ");
+        } else {
+            korrekt = vokabel.en.toLowerCase() === input;
+            loesung = vokabel.en;
+        }
+
+        if (korrekt) {
+            score++;
+            fb.innerText = "RICHTIG! 🌟";
+            fb.style.color = "#4caf50";
+        } else {
+            fb.innerText = `LEIDER NEIN... Richtig wäre: ${loesung}`;
+            fb.style.color = "#ff4081";
+        }
+
+        aktuellerIndex++;
+        setTimeout(zeigeVokabel, 2000);
+    }
+
+    function zeigeEnde() {
+        document.getElementById('quiz-screen').classList.add('hidden');
+        document.getElementById('end-screen').classList.remove('hidden');
+        document.getElementById('ergebnis-text').innerHTML = 
+            `Fertig! Du hast <b>${score} von ${lernStapel.length}</b> Vokabeln gewusst.`;
+    }
+</script>
+</body>
+</html>
