@@ -4,8 +4,6 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Mathe-Held Comic-Edition 🦸‍♂️</title>
-    
-    <!-- Die Verbindung zu deiner separaten CSS-Datei -->
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
@@ -165,78 +163,5 @@
     }
 </script>
 
-</body>
-</html>    for (let i = 1; i <= 10; i++) {
-        auswahlDiv.innerHTML += `
-            <label class="row-box">
-                <input type="checkbox" value="${i}" checked> ${i}er
-            </label>`;
-    }
-
-    function starteQuiz() {
-        name = document.getElementById('spieler-name').value || "Champion";
-        modus = document.querySelector('input[name="operator"]:checked').value;
-        
-        const checkboxes = document.querySelectorAll('#zahlen-auswahl input:checked');
-        gewaehlteZahlen = Array.from(checkboxes).map(cb => parseInt(cb.value));
-
-        if (gewaehlteZahlen.length === 0) {
-            alert("Bitte wähle mindestens eine Zahl zum Üben aus!");
-            return;
-        }
-
-        document.getElementById('start-screen').classList.add('hidden');
-        document.getElementById('quiz-screen').classList.remove('hidden');
-        neueAufgabe();
-    }
-
-    function neueAufgabe() {
-        if (runde > 20) return zeigeEnde();
-        
-        document.getElementById('fortschritt').innerText = `Frage ${runde} von 20`;
-        const z1 = gewaehlteZahlen[Math.floor(Math.random() * gewaehlteZahlen.length)];
-        const z2 = Math.floor(Math.random() * 10) + 1;
-        
-        let aktuellerModus = modus;
-        if (modus === 'beides') aktuellerModus = Math.random() > 0.5 ? 'mal' : 'geteilt';
-
-        if (aktuellerModus === 'mal') {
-            richtigesErgebnis = z1 * z2;
-            document.getElementById('aufgabe').innerText = `${z1} × ${z2}`;
-        } else {
-            // Für Geteilt: Wir rechnen erst z1 * z2, damit die Division aufgeht
-            let produkt = z1 * z2;
-            richtigesErgebnis = z2; 
-            document.getElementById('aufgabe').innerText = `${produkt} ÷ ${z1}`;
-        }
-
-        document.getElementById('antwort').value = '';
-        document.getElementById('antwort').focus();
-    }
-
-    function pruefeAntwort() {
-        const userAntwort = parseInt(document.getElementById('antwort').value);
-        const fb = document.getElementById('feedback');
-
-        if (userAntwort === richtigesErgebnis) {
-            score++;
-            fb.innerHTML = "Richtig! ✅";
-            fb.style.color = "green";
-        } else {
-            fb.innerHTML = `Falsch! Lösung: ${richtigesErgebnis} ❌`;
-            fb.style.color = "red";
-        }
-
-        runde++;
-        setTimeout(neueAufgabe, 1200);
-    }
-
-    function zeigeEnde() {
-        document.getElementById('quiz-screen').classList.add('hidden');
-        document.getElementById('end-screen').classList.remove('hidden');
-        document.getElementById('ende-name').innerText = name;
-        document.getElementById('ergebnis-text').innerText = `Du hast ${score} von 20 Aufgaben richtig gelöst!`;
-    }
-</script>
 </body>
 </html>
