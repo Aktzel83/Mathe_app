@@ -6,58 +6,88 @@
     <title>Vokabel-Held 🦸‍♂️</title>
     <link rel="stylesheet" href="style.css">
     <style>
-        /* Kleine Ergänzung für die Vokabel-Ansicht, damit es nicht "falsch" aussieht */
+        /* Spezielle Anpassungen für die Vokabel-Anzeige */
         #aufgabe {
-            font-size: 2.5rem !important; /* Etwas kleiner für lange Wörter */
-            min-height: 100px;
+            font-size: 2.5rem !important;
+            min-height: 120px;
             display: flex;
             align-items: center;
             justify-content: center;
             word-break: break-word;
             line-height: 1.2;
+            margin: 20px 0;
+            padding: 15px;
         }
-        select {
-            appearance: none;
-            background-color: #e3f2fd;
+        
+        #antwort-input {
+            width: 90%;
+            padding: 18px;
+            font-size: 1.4rem;
+            border: 4px solid var(--dark);
+            border-radius: 20px;
+            text-align: center;
+            font-family: 'Arial Black', sans-serif;
+            margin-bottom: 10px;
+            background: #e3f2fd;
+            box-shadow: 0 4px 0 var(--dark);
+        }
+
+        #sprach-modus {
+            width: 95%;
+            padding: 15px;
+            font-size: 1.2rem;
+            border: 4px solid var(--dark);
+            border-radius: 20px;
+            font-family: 'Arial Black', sans-serif;
+            margin-bottom: 20px;
+            background-color: white;
             cursor: pointer;
+        }
+
+        .btn-full {
+            width: 100%;
+            margin-top: 10px;
         }
     </style>
 </head>
 <body>
 
 <div class="container">
-    <!-- STARTMENÜ -->
+    <!-- 1. STARTMENÜ -->
     <div id="start-screen">
         <h1>Vokabel-Held ✍️</h1>
         <input type="text" id="spieler-name" placeholder="Dein Name">
         
         <h3>Abfragemodus:</h3>
-        <select id="sprach-modus" style="width: 90%; padding: 15px; font-size: 1.2rem; border: 4px solid var(--dark); border-radius: 20px; font-family: 'Arial Black', sans-serif; margin-bottom: 20px;">
+        <select id="sprach-modus">
             <option value="en_de">Englisch ➔ Deutsch</option>
             <option value="de_en">Deutsch ➔ Englisch</option>
             <option value="mix">Gemixt 🔄</option>
         </select>
 
-        <button class="num-btn ok-btn" onclick="starteTraining()" style="width: 100%;">LERNEN STARTEN! 🚀</button>
+        <button class="num-btn ok-btn btn-full" onclick="starteTraining()">STARTEN! 🚀</button>
+        <button class="num-btn action-btn btn-full" onclick="window.location.href='index.html'" style="font-size: 1.2rem;">ZURÜCK 🏠</button>
     </div>
 
-    <!-- QUIZ-BEREICH -->
+    <!-- 2. QUIZ-BEREICH -->
     <div id="quiz-screen" class="hidden">
-        <div id="fortschritt">Lädt...</div>
+        <div id="fortschritt">Wird geladen...</div>
         <div id="aufgabe">...</div>
         
-        <input type="text" id="antwort-input" placeholder="Antwort hier tippen..." autocomplete="off">
+        <input type="text" id="antwort-input" placeholder="Antwort tippen..." autocomplete="off">
         
-        <button class="num-btn ok-btn" onclick="pruefeAntwort()" id="check-btn" style="width: 100%;">PRÜFEN! ✅</button>
+        <button class="num-btn ok-btn btn-full" onclick="pruefeAntwort()">PRÜFEN! ✅</button>
+        <button class="num-btn action-btn btn-full" onclick="abbruch()" style="font-size: 1.2rem; background-color: var(--comic-pink);">ABBRECHEN ❌</button>
         
         <div id="feedback"></div>
     </div>
 
-    <!-- ENDERGEBNIS -->
+    <!-- 3. ENDERGEBNIS -->
     <div id="end-screen" class="hidden">
         <h1>BÄÄÄM! 🎉</h1>
         <p id="ergebnis-text"></p>
-        <button class="num-btn ok-btn" onclick="location.reload()" style="width: 100%;">NOCHMAL! 🔄</button>
+        <button class="num-btn ok-btn btn-full" onclick="location.reload()">NOCHMAL 🔄</button>
+        <button class="num-btn btn-full" onclick="window.location.href='index.html'" style="background: var(--comic-blue); color: white;">HAUPTMENÜ 🏠</button>
     </div>
 </div>
 
@@ -68,31 +98,25 @@
     let score = 0;
     let modus = "";
 
-    // Hilfsfunktion: Enter-Taste abfangen
+    // "Enter" Taste zum Prüfen aktivieren
     document.getElementById('antwort-input').addEventListener('keypress', function (e) {
-        if (e.key === 'Enter') pruefeAntwort();
+        if (e.key === 'Enter') {
+            pruefeAntwort();
+        }
     });
 
     async function starteTraining() {
         try {
-            // Cache-Buster hinzugefügt (?v=...), damit er immer die neueste JSON lädt
             const response = await fetch('vocabulary.json?v=' + Date.now());
-            if (!response.ok) throw new Error("Datei konnte nicht geladen werden (404)");
+            if (!response.ok) throw new Error("Datei nicht gefunden");
             
-            const text = await response.text();
-            // Hier prüfen wir, ob der Text wirklich gültiges JSON ist
-            try {
-                alleDaten = JSON.parse(text);
-            } catch (e) {
-                console.error("JSON Fehler Details:", text); // Zeigt in der Konsole, was falsch ist
-                throw new Error("Die vocabulary.json hat einen Schreibfehler!");
-            }
-            
+            alleDaten = await response.json();
             modus = document.getElementById('sprach-modus').value;
+            
             erstelleLernstapel();
             
             if (lernStapel.length === 0) {
-                alert("Keine Vokabeln in der Datei gefunden!");
+                alert("Keine Vokabeln gefunden!");
                 return;
             }
 
@@ -100,7 +124,7 @@
             document.getElementById('quiz-screen').classList.remove('hidden');
             zeigeVokabel();
         } catch (e) {
-            alert("⚠️ Fehler: " + e.message);
+            alert("Fehler beim Laden: " + e.message);
         }
     }
 
@@ -113,23 +137,24 @@
 
         let stapel = [];
 
-        // Neueste Woche (komplett)
+        // 1. Alle aus dem neuesten Block
         for (let en in alleDaten[neuesteWocheKey]) {
             stapel.push({ en: en, de: alleDaten[neuesteWocheKey][en], woche: neuesteWocheKey });
         }
 
-        // Alte Wochen (Zufalls-Mix)
-        let alleAlten = [];
+        // 2. Ca. 8 zufällige aus den alten Blöcken
+        let altePool = [];
         alteWochenKeys.forEach(w => {
             for (let en in alleDaten[w]) {
-                alleAlten.push({ en: en, de: alleDaten[w][en], woche: w });
+                altePool.push({ en: en, de: alleDaten[w][en], woche: w });
             }
         });
 
-        alleAlten.sort(() => Math.random() - 0.5);
-        stapel = stapel.concat(alleAlten.slice(0, 8)); // 8 alte Vokabeln dazu
+        altePool.sort(() => Math.random() - 0.5);
+        const auswahlAlt = altePool.slice(0, 8);
         
-        stapel.sort(() => Math.random() - 0.5);
+        stapel = stapel.concat(auswahlAlt);
+        stapel.sort(() => Math.random() - 0.5); // Alles durchmischen
         lernStapel = stapel;
     }
 
@@ -152,7 +177,7 @@
             anzeige.innerText = vokabel.en;
             anzeige.dataset.ziel = "de";
         } else {
-            // Wählt zufällig eine der deutschen Übersetzungen als Frage
+            // Zeige eine der deutschen Varianten als Frage
             anzeige.innerText = vokabel.de[Math.floor(Math.random() * vokabel.de.length)];
             anzeige.dataset.ziel = "en";
         }
@@ -183,7 +208,7 @@
             fb.innerText = "RICHTIG! 🌟";
             fb.style.color = "var(--comic-green)";
         } else {
-            fb.innerText = `UPS! 💡 ${loesung}`;
+            fb.innerText = `LÖSUNG: ${loesung}`;
             fb.style.color = "var(--comic-pink)";
         }
 
@@ -191,12 +216,18 @@
         setTimeout(zeigeVokabel, 2000);
     }
 
+    function abbruch() {
+        if (confirm("Abbrechen und zurück zum Hauptmenü?")) {
+            window.location.href = 'index.html';
+        }
+    }
+
     function zeigeEnde() {
         document.getElementById('quiz-screen').classList.add('hidden');
         document.getElementById('end-screen').classList.remove('hidden');
         const name = document.getElementById('spieler-name').value || "Held";
         document.getElementById('ergebnis-text').innerHTML = 
-            `STARK, <b>${name}</b>!<br>Du hast <b>${score} von ${lernStapel.length}</b> gewusst!`;
+            `STARK, <b>${name}</b>!<br>Ergebnis: <b>${score} von ${lernStapel.length}</b>`;
     }
 </script>
 </body>
