@@ -46,6 +46,26 @@ h3 {
     color: var(--dark);
 }
 
+/* Nameneingabefeld - größer */
+#spieler-name {
+    width: 90%;
+    padding: 18px;
+    font-size: 1.4rem;
+    border: 4px solid var(--dark);
+    border-radius: 20px;
+    margin-bottom: 20px;
+    font-family: 'Arial Black', sans-serif;
+    font-weight: bold;
+    text-align: center;
+    background: #e3f2fd;
+    box-shadow: 0 4px 0 var(--dark);
+}
+
+#spieler-name::placeholder {
+    color: #999;
+    font-weight: normal;
+}
+
 input[type="text"] {
     width: 90%;
     padding: 12px;
