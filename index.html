@@ -2,13 +2,27 @@
 <html lang="de">
 <head>
     <meta charset="UTF-8">
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    
+    <!-- iPad & iPhone Home-Screen Icon Tags -->
+    <link rel="apple-touch-icon" href="icon.png">
+    <link rel="apple-touch-icon-precomposed" href="icon.png">
+    
+    <!-- Web App Einstellungen für iOS (iPad) -->
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="Lern-Held">
+
     <title>Lern-Zentrale 🎓</title>
     <link rel="stylesheet" href="style.css">
+    
     <style>
         :root {
             --math-color: #ff9800;
             --vocab-color: #2196f3;
+            --dark: #2c3e50;
+            --comic-pink: #e91e63;
         }
 
         body {
@@ -18,24 +32,25 @@
             align-items: center;
             min-height: 100vh;
             margin: 0;
+            font-family: 'Arial Rounded MT Bold', 'Helvetica', sans-serif;
         }
 
         .container {
             max-width: 600px;
             width: 90%;
+            text-align: center;
         }
 
         h1 {
             font-size: 3rem;
             margin-bottom: 10px;
-            text-shadow: 3px 3px 0px rgba(0,0,0,0.1);
+            color: var(--dark);
         }
 
         .intro-text {
             font-size: 1.2rem;
             margin-bottom: 30px;
             color: #555;
-            font-family: 'Arial Rounded MT Bold', sans-serif;
         }
 
         .app-selector {
@@ -52,14 +67,13 @@
             display: flex;
             align-items: center;
             cursor: pointer;
-            transition: all 0.2s ease;
+            transition: all 0.15s ease-in-out;
             position: relative;
             overflow: hidden;
             box-shadow: 8px 8px 0 var(--dark);
             text-align: left;
         }
 
-        /* Hover-Effekte */
         .app-card:hover {
             transform: translate(-4px, -4px);
             box-shadow: 12px 12px 0 var(--dark);
@@ -71,16 +85,23 @@
         }
 
         .app-icon {
-            font-size: 4rem;
+            font-size: 3.5rem;
             margin-right: 20px;
-            background: #eee;
-            width: 80px;
-            height: 80px;
+            width: 85px;
+            height: 85px;
             display: flex;
             align-items: center;
             justify-content: center;
             border-radius: 18px;
             border: 3px solid var(--dark);
+            flex-shrink: 0;
+            background-color: #eee;
+        }
+
+        .app-icon img {
+            width: 80%;
+            height: 80%;
+            object-fit: contain;
         }
 
         .app-info {
@@ -89,7 +110,7 @@
 
         .app-info h2 {
             margin: 0;
-            font-size: 1.8rem;
+            font-size: 1.7rem;
             color: var(--dark);
         }
 
@@ -97,30 +118,28 @@
             margin: 5px 0 0;
             font-size: 1rem;
             color: #666;
+            line-height: 1.2;
         }
 
-        /* Individuelle Farben für die Karten */
         .card-mathe .app-icon { background-color: var(--math-color); }
         .card-vokabel .app-icon { background-color: var(--vocab-color); }
 
         .start-arrow {
-            font-size: 1.5rem;
+            font-size: 1.8rem;
             font-weight: bold;
             color: var(--dark);
             margin-left: 10px;
         }
 
-        /* Kleiner Badge "NEU" oder "TOP" */
         .badge {
             position: absolute;
-            top: 10px;
-            right: -30px;
-            background: var(--comic-pink);
+            top: 12px;
+            right: -35px;
+            background: #ff5722;
             color: white;
             padding: 5px 40px;
             transform: rotate(45deg);
-            font-size: 0.8rem;
-            font-family: sans-serif;
+            font-size: 0.75rem;
             font-weight: bold;
             border: 2px solid var(--dark);
         }
@@ -129,7 +148,7 @@
 <body>
 
 <div class="container">
-    <div id="start-screen" style="display: block;">
+    <div id="start-screen">
         <h1>Lern-Zentrale 🎓</h1>
         <p class="intro-text">Welcher Held willst du heute sein?</p>
         
@@ -146,17 +165,19 @@
             
             <!-- Vokabel Card -->
             <div class="app-card card-vokabel" onclick="window.location.href='vokabel.html'">
-                <div class="badge">BELIEBT</div>
-                <div class="app-icon">🌍</div>
+                <div class="badge">TOP</div>
+                <div class="app-icon">
+                    <img src="icon.png" alt="Icon">
+                </div>
                 <div class="app-info">
                     <h2>Vokabel-Held</h2>
-                    <p>Englisch meistern </p>
+                    <p>LerneEnglisch-Vokabeln & und gewinne Switch-Zeit</p>
                 </div>
                 <div class="start-arrow">➔</div>
             </div>
         </div>
         
-        <p style="margin-top: 40px; font-size: 0.9rem; color: #888;">&copy; 2026  - powered bei Pappi ;-)</p>
+        <p style="margin-top: 40px; font-size: 0.8rem; color: #aaa;">&copy; 2026 powered bei Papi</p>
     </div>
 </div>
 
