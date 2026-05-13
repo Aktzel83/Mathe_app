@@ -10,13 +10,13 @@
         #antwort-input { width: 90%; padding: 18px; font-size: 1.4rem; border: 4px solid var(--dark); border-radius: 20px; text-align: center; font-family: 'Arial Black', sans-serif; margin-bottom: 10px; background: #e3f2fd; box-shadow: 0 4px 0 var(--dark); }
         #sprach-modus { width: 95%; padding: 15px; font-size: 1.2rem; border: 4px solid var(--dark); border-radius: 20px; font-family: 'Arial Black', sans-serif; margin-bottom: 20px; background-color: white; cursor: pointer; }
         .btn-full { width: 100%; margin-top: 10px; }
-        #ergebnis-text { max-height: 450px; overflow-y: auto; padding: 10px; text-align: center; }
+        #ergebnis-text { max-height: 500px; overflow-y: auto; padding: 10px; text-align: center; }
         .fehler-box { margin-top: 20px; text-align: left; font-size: 1.1rem; background: #fff3cd; padding: 15px; border: 3px solid var(--dark); border-radius: 15px; box-shadow: 4px 4px 0 var(--dark); }
         .note-display { font-size: 4rem; margin: 15px 0; font-family: 'Arial Black', sans-serif; text-shadow: 2px 2px 0 var(--dark); }
         
         #gutschein-anzeige {
             display: none;
-            margin-top: 20px;
+            margin: 20px 0;
             padding: 20px;
             background: #ffeb3b;
             border: 5px dashed var(--dark);
@@ -27,7 +27,7 @@
         }
         .gutschein-titel { font-size: 1.5rem; text-decoration: underline; margin-bottom: 10px; }
         .gutschein-zeit { font-size: 2rem; color: #e91e63; }
-        .gutschein-info { font-size: 0.9rem; margin-top: 10px; border-top: 2px solid var(--dark); padding-top: 5px; }
+        .gutschein-info { font-size: 0.8rem; margin-top: 10px; border-top: 2px solid var(--dark); padding-top: 5px; font-family: sans-serif; font-weight: normal; }
     </style>
 </head>
 <body>
@@ -59,7 +59,7 @@
         <h1>ERGEBNIS 🎉</h1>
         <div id="ergebnis-text"></div>
         <div id="gutschein-anzeige"></div>
-        <button id="gutschein-btn" class="num-btn action-btn btn-full hidden" style="background: #4caf50;" onclick="erzeugeGutschein()">GUTSCHEIN HOLEN! 🎁</button>
+        <button id="gutschein-btn" class="num-btn action-btn btn-full hidden" style="background: #4caf50; color: white;" onclick="erzeugeGutschein()">GUTSCHEIN HOLEN! 🎁</button>
         <button class="num-btn ok-btn btn-full" onclick="location.reload()" style="margin-top: 20px;">NOCHMAL 🔄</button>
         <button class="num-btn btn-full" onclick="window.location.href='index.html'" style="background: var(--comic-blue); color: white;">HAUPTMENÜ 🏠</button>
     </div>
@@ -71,8 +71,8 @@
 
     document.getElementById('antwort-input').addEventListener('keypress', (e) => { if (e.key === 'Enter') pruefeAntwort(); });
 
+    // Satzzeichen entfernen & Kleinschreibung
     function bereinigeText(text) {
-        // Entfernt den Stern für den Vergleich und alle Satzzeichen
         return text.replace(/\*/g, "").toLowerCase().replace(/[.,?!;:()'´`"/-]/g, "").replace(/\s+/g, " ").trim();
     }
 
@@ -101,11 +101,13 @@
         const bloecke = Object.keys(alleDaten);
         const neuesterBlockKey = bloecke[bloecke.length - 1];
         let stapel = [];
-        
+        fehlerListe = [];
+        aktuellerIndex = 0;
+        score = 0;
+
         for (let en in alleDaten[neuesterBlockKey]) { 
             stapel.push({ en: en, de: alleDaten[neuesterBlockKey][en], block: neuesterBlockKey }); 
         }
-        
         if (!config.nurAktuellerBlock) {
             let altePool = [];
             bloecke.slice(0, -1).forEach(b => { 
@@ -133,14 +135,8 @@
             anzeige.innerText = v.en;
             anzeige.dataset.ziel = "de";
         } else {
-            // Filtert nur die Wörter mit Stern heraus
             const originalWoerter = v.de.filter(word => word.startsWith("*"));
-            // Falls mal kein Stern da ist, nimm das erste Wort als Backup
-            const gewaehltesWort = originalWoerter.length > 0 
-                ? originalWoerter[Math.floor(Math.random() * originalWoerter.length)] 
-                : v.de[0];
-            
-            // Zeige das Wort ohne den Stern an
+            const gewaehltesWort = originalWoerter.length > 0 ? originalWoerter[Math.floor(Math.random() * originalWoerter.length)] : v.de[0];
             anzeige.innerText = gewaehltesWort.replace("*", "");
             anzeige.dataset.ziel = "en";
         }
@@ -156,7 +152,6 @@
         
         let korrekt = false;
         if (ziel === "de") {
-            // Hier sind alle Wörter (mit und ohne Stern) korrekt
             korrekt = v.de.some(d => bereinigeText(d) === inputSafe);
         } else {
             korrekt = bereinigeText(v.en) === inputSafe;
@@ -167,7 +162,6 @@
             document.getElementById('feedback').innerText = "RICHTIG! 🌟"; 
             document.getElementById('feedback').style.color = "var(--comic-green)"; 
         } else { 
-            // Anzeige der Lösung: Sterne werden für die Anzeige entfernt
             let loesungenSauber = v.de.map(d => d.replace("*", ""));
             let l = (ziel === "de") ? loesungenSauber.join(", ") : v.en;
             document.getElementById('feedback').innerText = `LÖSUNG: ${l}`; 
@@ -183,12 +177,29 @@
         document.getElementById('end-screen').classList.remove('hidden');
         const name = document.getElementById('spieler-name').value || "Held";
         const prozent = score / lernStapel.length;
+        
         erreichteNote = "6";
         const sortierteNoten = Object.keys(config.noten).sort((a, b) => a - b);
         for (let n of sortierteNoten) { if (prozent >= config.noten[n]) { erreichteNote = n; break; } }
+        
         const farbe = erreichteNote <= 2 ? "var(--comic-green)" : (erreichteNote <= 4 ? "var(--dark)" : "var(--comic-pink)");
-        let html = `SUPER, <b>${name}</b>!<br>Ergebnis: ${score}/${lernStapel.length}<div class="note-display" style="color: ${farbe}">NOTE: ${erreichteNote}</div>`;
-        if (erreichteNote === "1" || erreichteNote === "2") document.getElementById('gutschein-btn').classList.remove('hidden');
+        
+        let html = `STARK, <b>${name}</b>!<br>Ergebnis: ${score} von ${lernStapel.length}`;
+        html += `<div class="note-display" style="color: ${farbe}">NOTE: ${erreichteNote}</div>`;
+        
+        if (fehlerListe.length > 0) {
+            html += `<div class="fehler-box"><h3>Deine Berichtigung:</h3><ul style="text-align: left; padding-left: 20px;">`;
+            fehlerListe.forEach(f => {
+                html += `<li style="margin-bottom: 8px;">❌ <b>${f.frage}</b> ➔ <span style="color: green;">${f.antwort}</span></li>`;
+            });
+            html += `</ul></div>`;
+        } else {
+            html += `<p style="color: var(--comic-green); font-weight: bold;">FEHLERFREI! Du bist ein Profi! 🏆</p>`;
+        }
+        
+        if (erreichteNote === "1" || erreichteNote === "2") {
+            document.getElementById('gutschein-btn').classList.remove('hidden');
+        }
         document.getElementById('ergebnis-text').innerHTML = html;
     }
 
@@ -198,7 +209,12 @@
         const jetzt = new Date();
         const stamp = jetzt.toLocaleDateString() + " um " + jetzt.toLocaleTimeString();
         const gDiv = document.getElementById('gutschein-anzeige');
-        gDiv.innerHTML = `<div class="gutschein-titel">🎮 SWITCH-GUTSCHEIN 🎮</div><div class="gutschein-zeit">${zeit}</div><div>für den Helden: <b>${name}</b></div><div class="gutschein-info">Gültig ab: ${stamp}<br>ID: ${Math.random().toString(36).substr(2, 9).toUpperCase()}</div>`;
+        gDiv.innerHTML = `
+            <div class="gutschein-titel">🎮 SWITCH-GUTSCHEIN 🎮</div>
+            <div class="gutschein-zeit">${zeit}</div>
+            <div>für den Helden: <b>${name}</b></div>
+            <div class="gutschein-info">Gültig ab: ${stamp}<br>ID: ${Math.random().toString(36).substr(2, 9).toUpperCase()}</div>
+        `;
         gDiv.style.display = "block";
         document.getElementById('gutschein-btn').classList.add('hidden');
     }
