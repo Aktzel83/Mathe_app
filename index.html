@@ -3,31 +3,160 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Lern-Apps 🎓</title>
+    <title>Lern-Zentrale 🎓</title>
     <link rel="stylesheet" href="style.css">
+    <style>
+        :root {
+            --math-color: #ff9800;
+            --vocab-color: #2196f3;
+        }
+
+        body {
+            background-color: #f0f0f0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+        }
+
+        .container {
+            max-width: 600px;
+            width: 90%;
+        }
+
+        h1 {
+            font-size: 3rem;
+            margin-bottom: 10px;
+            text-shadow: 3px 3px 0px rgba(0,0,0,0.1);
+        }
+
+        .intro-text {
+            font-size: 1.2rem;
+            margin-bottom: 30px;
+            color: #555;
+            font-family: 'Arial Rounded MT Bold', sans-serif;
+        }
+
+        .app-selector {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        .app-card {
+            background: white;
+            border: 5px solid var(--dark);
+            border-radius: 25px;
+            padding: 20px;
+            display: flex;
+            align-items: center;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            position: relative;
+            overflow: hidden;
+            box-shadow: 8px 8px 0 var(--dark);
+            text-align: left;
+        }
+
+        /* Hover-Effekte */
+        .app-card:hover {
+            transform: translate(-4px, -4px);
+            box-shadow: 12px 12px 0 var(--dark);
+        }
+
+        .app-card:active {
+            transform: translate(4px, 4px);
+            box-shadow: 2px 2px 0 var(--dark);
+        }
+
+        .app-icon {
+            font-size: 4rem;
+            margin-right: 20px;
+            background: #eee;
+            width: 80px;
+            height: 80px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 18px;
+            border: 3px solid var(--dark);
+        }
+
+        .app-info {
+            flex-grow: 1;
+        }
+
+        .app-info h2 {
+            margin: 0;
+            font-size: 1.8rem;
+            color: var(--dark);
+        }
+
+        .app-info p {
+            margin: 5px 0 0;
+            font-size: 1rem;
+            color: #666;
+        }
+
+        /* Individuelle Farben für die Karten */
+        .card-mathe .app-icon { background-color: var(--math-color); }
+        .card-vokabel .app-icon { background-color: var(--vocab-color); }
+
+        .start-arrow {
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: var(--dark);
+            margin-left: 10px;
+        }
+
+        /* Kleiner Badge "NEU" oder "TOP" */
+        .badge {
+            position: absolute;
+            top: 10px;
+            right: -30px;
+            background: var(--comic-pink);
+            color: white;
+            padding: 5px 40px;
+            transform: rotate(45deg);
+            font-size: 0.8rem;
+            font-family: sans-serif;
+            font-weight: bold;
+            border: 2px solid var(--dark);
+        }
+    </style>
 </head>
 <body>
 
 <div class="container">
-    <div id="start-screen">
-        <h1>Lern-Apps 🎓</h1>
-        <p class="intro-text">Wähle die App, mit der du üben möchtest!</p>
+    <div id="start-screen" style="display: block;">
+        <h1>Lern-Zentrale 🎓</h1>
+        <p class="intro-text">Welcher Held willst du heute sein?</p>
         
         <div class="app-selector">
-            <div class="app-card" onclick="window.location.href='mathe.html'">
+            <!-- Mathe Card -->
+            <div class="app-card card-mathe" onclick="window.location.href='mathe.html'">
                 <div class="app-icon">⚡</div>
-                <h2>Mathe-Held</h2>
-                <p>Trainiere dein Kopfrechnen!</p>
-                <div class="app-button">Starten →</div>
+                <div class="app-info">
+                    <h2>Mathe-Held</h2>
+                    <p>Schnelles Kopfrechnen & Rekorde</p>
+                </div>
+                <div class="start-arrow">➔</div>
             </div>
             
-            <div class="app-card" onclick="window.location.href='vokabel.html'">
+            <!-- Vokabel Card -->
+            <div class="app-card card-vokabel" onclick="window.location.href='vokabel.html'">
+                <div class="badge">BELIEBT</div>
                 <div class="app-icon">🌍</div>
-                <h2>Vocab-Master</h2>
-                <p>Lerne Englisch-Vokabeln!</p>
-                <div class="app-button">Starten →</div>
+                <div class="app-info">
+                    <h2>Vokabel-Held</h2>
+                    <p>Englisch meistern & Switch spielen</p>
+                </div>
+                <div class="start-arrow">➔</div>
             </div>
         </div>
+        
+        <p style="margin-top: 40px; font-size: 0.9rem; color: #888;">&copy; 2024 Dein Lern-Coach</p>
     </div>
 </div>
 
