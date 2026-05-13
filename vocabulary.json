@@ -63,16 +63,24 @@
     "finish": ["*etwas beenden", "*mit etwas fertig werden", "abschließen", "fertigstellen"],
     "Come on": ["*Na los", "*Komm", "Los geht's"],
     "How are you?": ["*Wie geht's?", "*Wie geht es dir?"],
-    "Listen, Justin": ["*Hör zu, Justin"],
     "listen": ["*zuhören", "*horchen", "lauschen"],
     "much": ["*viel", "sehr viel"],
     "job": ["*Job", "Arbeit", "Beruf", "Stelle"],
     "studio": ["*Studio", "Atelier"],
     "programme": ["*Programm", "*Sendung", "Show"],
-    "What programmes...?": ["*Welche Sendungen?"],
     "later": ["*später", "nachher"],
     "midnight": ["*Mitternacht"],
     "too late": ["*zu spät"],
-    "get up": ["*aufstehen"]
+    "get up": ["*aufstehen"],
+    "How do you like it?": ["*Wie findest du es?", "*Wie gefällt es dir?", "Was hältst du davon?"],
+    "It's about": ["*Es geht um", "*Es handelt von", "Es dreht sich um"],
+    "send": ["*schicken", "*senden", "übermitteln", "übersenden"],
+    "idea": ["*Idee", "*Vorstellung", "Einfall", "Gedanke"],
+    "hear": ["*hören", "vernehmen", "wahrnehmen"],
+    "partner": ["*Partner/in", "Mitarbeiter/in", "Teilhaber/in"],
+    "interview": ["*interviewen", "*befragen", "ein Interview führen"],
+    "age": ["*Alter", "Lebensalter"],
+    "also": ["*auch", "ebenfalls", "zudem"],
+    "metre": ["*Meter"]
   }
 }
