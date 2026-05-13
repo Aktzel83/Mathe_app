@@ -1,5 +1,13 @@
 {
   "maxAlteWoerter": 8,
   "nurAktuellerBlock": false,
-  "zufaelligeReihenfolge": true
+  "zufaelligeReihenfolge": true,
+  "noten": {
+    "1": 0.90,
+    "2": 0.80,
+    "3": 0.70,
+    "4": 0.60,
+    "5": 0.30,
+    "6": 0.00
+  }
 }
