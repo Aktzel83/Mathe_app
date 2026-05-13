@@ -77,7 +77,7 @@
     "send": ["*schicken", "*senden", "übermitteln", "übersenden"],
     "idea": ["*Idee", "*Vorstellung", "Einfall", "Gedanke"],
     "hear": ["*hören", "vernehmen", "wahrnehmen"],
-    "partner": ["*Partner/in", "Mitarbeiter/in", "Teilhaber/in"],
+    "partner": ["*Partner", "Mitarbeiter", "Teilhaber"],
     "interview": ["*interviewen", "*befragen", "ein Interview führen"],
     "age": ["*Alter", "Lebensalter"],
     "also": ["*auch", "ebenfalls", "zudem"],
