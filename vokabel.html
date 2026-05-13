@@ -71,9 +71,9 @@
 
     document.getElementById('antwort-input').addEventListener('keypress', (e) => { if (e.key === 'Enter') pruefeAntwort(); });
 
-    // Hilfsfunktion: Entfernt alle Satzzeichen und macht alles kleingeschrieben
     function bereinigeText(text) {
-        return text.toLowerCase().replace(/[.,?!;:()'´`"/-]/g, "").replace(/\s+/g, " ").trim();
+        // Entfernt den Stern für den Vergleich und alle Satzzeichen
+        return text.replace(/\*/g, "").toLowerCase().replace(/[.,?!;:()'´`"/-]/g, "").replace(/\s+/g, " ").trim();
     }
 
     async function starteTraining() {
@@ -98,15 +98,19 @@
     }
 
     function erstelleLernstapel() {
-        const wochen = Object.keys(alleDaten);
-        const neuesteWocheKey = wochen[wochen.length - 1];
+        const bloecke = Object.keys(alleDaten);
+        const neuesterBlockKey = bloecke[bloecke.length - 1];
         let stapel = [];
-        for (let en in alleDaten[neuesteWocheKey]) { 
-            stapel.push({ en: en, de: alleDaten[neuesteWocheKey][en], woche: neuesteWocheKey }); 
+        
+        for (let en in alleDaten[neuesterBlockKey]) { 
+            stapel.push({ en: en, de: alleDaten[neuesterBlockKey][en], block: neuesterBlockKey }); 
         }
+        
         if (!config.nurAktuellerBlock) {
             let altePool = [];
-            wochen.slice(0, -1).forEach(w => { for (let en in alleDaten[w]) { altePool.push({ en: en, de: alleDaten[w][en], woche: w }); } });
+            bloecke.slice(0, -1).forEach(b => { 
+                for (let en in alleDaten[b]) { altePool.push({ en: en, de: alleDaten[b][en], block: b }); } 
+            });
             altePool.sort(() => Math.random() - 0.5);
             stapel = stapel.concat(altePool.slice(0, config.maxAlteWoerter));
         }
@@ -121,9 +125,25 @@
         input.value = ""; input.focus();
         document.getElementById('feedback').innerText = "";
         document.getElementById('fortschritt').innerText = `WORT ${aktuellerIndex + 1} / ${lernStapel.length}`;
+        
         let r = (modus === "mix") ? (Math.random() > 0.5 ? "en_de" : "de_en") : modus;
-        document.getElementById('aufgabe').innerText = (r === "en_de") ? v.en : v.de[0];
-        document.getElementById('aufgabe').dataset.ziel = (r === "en_de") ? "de" : "en";
+        const anzeige = document.getElementById('aufgabe');
+
+        if (r === "en_de") {
+            anzeige.innerText = v.en;
+            anzeige.dataset.ziel = "de";
+        } else {
+            // Filtert nur die Wörter mit Stern heraus
+            const originalWoerter = v.de.filter(word => word.startsWith("*"));
+            // Falls mal kein Stern da ist, nimm das erste Wort als Backup
+            const gewaehltesWort = originalWoerter.length > 0 
+                ? originalWoerter[Math.floor(Math.random() * originalWoerter.length)] 
+                : v.de[0];
+            
+            // Zeige das Wort ohne den Stern an
+            anzeige.innerText = gewaehltesWort.replace("*", "");
+            anzeige.dataset.ziel = "en";
+        }
     }
 
     function pruefeAntwort() {
@@ -136,6 +156,7 @@
         
         let korrekt = false;
         if (ziel === "de") {
+            // Hier sind alle Wörter (mit und ohne Stern) korrekt
             korrekt = v.de.some(d => bereinigeText(d) === inputSafe);
         } else {
             korrekt = bereinigeText(v.en) === inputSafe;
@@ -146,7 +167,9 @@
             document.getElementById('feedback').innerText = "RICHTIG! 🌟"; 
             document.getElementById('feedback').style.color = "var(--comic-green)"; 
         } else { 
-            let l = (ziel === "de") ? v.de.join(", ") : v.en;
+            // Anzeige der Lösung: Sterne werden für die Anzeige entfernt
+            let loesungenSauber = v.de.map(d => d.replace("*", ""));
+            let l = (ziel === "de") ? loesungenSauber.join(", ") : v.en;
             document.getElementById('feedback').innerText = `LÖSUNG: ${l}`; 
             document.getElementById('feedback').style.color = "var(--comic-pink)";
             fehlerListe.push({ frage: document.getElementById('aufgabe').innerText, antwort: l });
