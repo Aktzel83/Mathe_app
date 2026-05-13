@@ -14,7 +14,6 @@
         .fehler-box { margin-top: 20px; text-align: left; font-size: 1.1rem; background: #fff3cd; padding: 15px; border: 3px solid var(--dark); border-radius: 15px; box-shadow: 4px 4px 0 var(--dark); }
         .note-display { font-size: 4rem; margin: 15px 0; font-family: 'Arial Black', sans-serif; text-shadow: 2px 2px 0 var(--dark); }
         
-        /* Gutschein Style */
         #gutschein-anzeige {
             display: none;
             margin-top: 20px;
@@ -59,10 +58,7 @@
     <div id="end-screen" class="hidden">
         <h1>ERGEBNIS 🎉</h1>
         <div id="ergebnis-text"></div>
-        
-        <!-- Hier erscheint der Gutschein nach Klick -->
         <div id="gutschein-anzeige"></div>
-        
         <button id="gutschein-btn" class="num-btn action-btn btn-full hidden" style="background: #4caf50;" onclick="erzeugeGutschein()">GUTSCHEIN HOLEN! 🎁</button>
         <button class="num-btn ok-btn btn-full" onclick="location.reload()" style="margin-top: 20px;">NOCHMAL 🔄</button>
         <button class="num-btn btn-full" onclick="window.location.href='index.html'" style="background: var(--comic-blue); color: white;">HAUPTMENÜ 🏠</button>
@@ -75,12 +71,24 @@
 
     document.getElementById('antwort-input').addEventListener('keypress', (e) => { if (e.key === 'Enter') pruefeAntwort(); });
 
+    // Hilfsfunktion: Entfernt alle Satzzeichen und macht alles kleingeschrieben
+    function bereinigeText(text) {
+        return text.toLowerCase().replace(/[.,?!;:()'´`"/-]/g, "").replace(/\s+/g, " ").trim();
+    }
+
     async function starteTraining() {
         try {
-            const [vRes, cRes] = await Promise.all([fetch('vocabulary.json?v=' + Date.now()), fetch('config.json?v=' + Date.now())]);
+            const [vRes, cRes] = await Promise.all([
+                fetch('vocabulary.json?v=' + Date.now()), 
+                fetch('config.json?v=' + Date.now())
+            ]);
             if (!vRes.ok) throw new Error("Vokabeldatei fehlt");
             alleDaten = await vRes.json();
-            config = cRes.ok ? await cRes.json() : { maxAlteWoerter: 8, nurAktuellerBlock: false, zufaelligeReihenfolge: true, noten: { "1": 0.9, "2": 0.8, "3": 0.7, "4": 0.6, "5": 0.3, "6": 0.0 }, belohnung: {"1": "60 Min. Switch", "2": "30 Min. Switch"} };
+            config = cRes.ok ? await cRes.json() : { 
+                maxAlteWoerter: 8, 
+                noten: { "1": 0.9, "2": 0.8, "3": 0.7, "4": 0.6, "5": 0.3, "6": 0.0 }, 
+                belohnung: {"1": "60 Min. Switch", "2": "30 Min. Switch"} 
+            };
             modus = document.getElementById('sprach-modus').value;
             erstelleLernstapel();
             document.getElementById('start-screen').classList.add('hidden');
@@ -93,7 +101,9 @@
         const wochen = Object.keys(alleDaten);
         const neuesteWocheKey = wochen[wochen.length - 1];
         let stapel = [];
-        for (let en in alleDaten[neuesteWocheKey]) { stapel.push({ en: en, de: alleDaten[neuesteWocheKey][en], woche: neuesteWocheKey }); }
+        for (let en in alleDaten[neuesteWocheKey]) { 
+            stapel.push({ en: en, de: alleDaten[neuesteWocheKey][en], woche: neuesteWocheKey }); 
+        }
         if (!config.nurAktuellerBlock) {
             let altePool = [];
             wochen.slice(0, -1).forEach(w => { for (let en in alleDaten[w]) { altePool.push({ en: en, de: alleDaten[w][en], woche: w }); } });
@@ -117,19 +127,32 @@
     }
 
     function pruefeAntwort() {
-        const input = document.getElementById('antwort-input').value.trim().toLowerCase();
-        if (input === "" || document.getElementById('quiz-screen').classList.contains('hidden')) return;
+        const inputRaw = document.getElementById('antwort-input').value.trim();
+        if (inputRaw === "" || document.getElementById('quiz-screen').classList.contains('hidden')) return;
+        
+        const inputSafe = bereinigeText(inputRaw);
         const v = lernStapel[aktuellerIndex];
         const ziel = document.getElementById('aufgabe').dataset.ziel;
-        let korrekt = (ziel === "de") ? v.de.some(d => d.toLowerCase() === input) : v.en.toLowerCase() === input;
-        if (korrekt) { score++; document.getElementById('feedback').innerText = "RICHTIG! 🌟"; document.getElementById('feedback').style.color = "var(--comic-green)"; }
-        else { 
+        
+        let korrekt = false;
+        if (ziel === "de") {
+            korrekt = v.de.some(d => bereinigeText(d) === inputSafe);
+        } else {
+            korrekt = bereinigeText(v.en) === inputSafe;
+        }
+
+        if (korrekt) { 
+            score++; 
+            document.getElementById('feedback').innerText = "RICHTIG! 🌟"; 
+            document.getElementById('feedback').style.color = "var(--comic-green)"; 
+        } else { 
             let l = (ziel === "de") ? v.de.join(", ") : v.en;
             document.getElementById('feedback').innerText = `LÖSUNG: ${l}`; 
             document.getElementById('feedback').style.color = "var(--comic-pink)";
             fehlerListe.push({ frage: document.getElementById('aufgabe').innerText, antwort: l });
         }
-        aktuellerIndex++; setTimeout(zeigeVokabel, 2000);
+        aktuellerIndex++; 
+        setTimeout(zeigeVokabel, 2000);
     }
 
     function zeigeEnde() {
@@ -140,14 +163,9 @@
         erreichteNote = "6";
         const sortierteNoten = Object.keys(config.noten).sort((a, b) => a - b);
         for (let n of sortierteNoten) { if (prozent >= config.noten[n]) { erreichteNote = n; break; } }
-
         const farbe = erreichteNote <= 2 ? "var(--comic-green)" : (erreichteNote <= 4 ? "var(--dark)" : "var(--comic-pink)");
         let html = `SUPER, <b>${name}</b>!<br>Ergebnis: ${score}/${lernStapel.length}<div class="note-display" style="color: ${farbe}">NOTE: ${erreichteNote}</div>`;
-        
-        if (erreichteNote === "1" || erreichteNote === "2") {
-            document.getElementById('gutschein-btn').classList.remove('hidden');
-        }
-        
+        if (erreichteNote === "1" || erreichteNote === "2") document.getElementById('gutschein-btn').classList.remove('hidden');
         document.getElementById('ergebnis-text').innerHTML = html;
     }
 
@@ -156,14 +174,8 @@
         const zeit = config.belohnung[erreichteNote] || "Bonuszeit";
         const jetzt = new Date();
         const stamp = jetzt.toLocaleDateString() + " um " + jetzt.toLocaleTimeString();
-        
         const gDiv = document.getElementById('gutschein-anzeige');
-        gDiv.innerHTML = `
-            <div class="gutschein-titel">🎮 SWITCH-GUTSCHEIN 🎮</div>
-            <div class="gutschein-zeit">${zeit}</div>
-            <div>für den Helden: <b>${name}</b></div>
-            <div class="gutschein-info">Gültig ab: ${stamp}<br>ID: ${Math.random().toString(36).substr(2, 9).toUpperCase()}</div>
-        `;
+        gDiv.innerHTML = `<div class="gutschein-titel">🎮 SWITCH-GUTSCHEIN 🎮</div><div class="gutschein-zeit">${zeit}</div><div>für den Helden: <b>${name}</b></div><div class="gutschein-info">Gültig ab: ${stamp}<br>ID: ${Math.random().toString(36).substr(2, 9).toUpperCase()}</div>`;
         gDiv.style.display = "block";
         document.getElementById('gutschein-btn').classList.add('hidden');
     }
