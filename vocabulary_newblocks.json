@@ -1,6 +1,7 @@
 
 {
   "Block_4": {
+    "on Saturday afternoon": ["*am Samstagnachmittag"],
     "ride a bike": ["*Rad fahren", "Fahrrad fahren"],
     "bike": ["*Fahrrad", "Rad"],
     "stop": ["*anhalten", "*stoppen", "aufhören"],
@@ -14,9 +15,7 @@
     "turn around": ["*sich umdrehen", "umkehren"],
     "ghost": ["*Geist", "*Gespenst", "Spuk"],
     "ready": ["*bereit", "*fertig", "vorbereitet"],
-    "loud": ["*laut", "lautstark"]
-  },
-  "Block_5": {
+    "loud": ["*laut", "lautstark"],
     "scary": ["*unheimlich", "*gruselig", "beängstigend"],
     "traveller": ["*Reisende", "Reisender"],
     "travel": ["*reisen", "verreisen"],
@@ -29,7 +28,9 @@
     "pound": ["*Pfund"],
     "imagine": ["*sich etwas vorstellen", "sich einbilden"],
     "life": ["*Leben", "Existenz"],
-    "city": ["*Stadt", "*Großstadt", "Metropole"],
+    "city": ["*Stadt", "*Großstadt", "Metropole"]
+  },
+  "Block_5": {
     "sound": ["*Geräusch", "*Klang", "Ton"],
     "attic": ["*Dachboden", "Dachgeschoss"],
     "boring": ["*langweilig", "öde"],
