@@ -87,12 +87,12 @@
     "on Saturday afternoon": ["*am Samstagnachmittag"],
     "ride a bike": ["*Rad fahren", "Fahrrad fahren"],
     "bike": ["*Fahrrad", "Rad"],
-    "stop": ["*anhalten", "*stoppen", "aufhören"],
+    "stop": ["*anhalten", "*stoppen", "aufhören","stop"],
     "tired": ["*müde", "erschöpft"],
     "be thirsty": ["*durstig sein", "*Durst haben"],
     "chocolate": ["*Schokolade"],
     "usually": ["*meistens", "*normalerweise", "*gewöhnlich", "in der Regel"],
-    "turn on": ["*etwas einschalten", "anmachen"],
+    "turn on": ["*etwas einschalten", "anmachen","einschalten","anschalten"],
     "behind": ["*hinter", "dahinter"],
     "in front of": ["*vor", "vorne"],
     "turn around": ["*sich umdrehen", "umkehren"],
@@ -109,7 +109,7 @@
     "child": ["*Kind", "Kleinkind"],
     "ticket": ["*Eintrittskarte", "Fahrkarte", "Ticket"],
     "pound": ["*Pfund"],
-    "imagine": ["*sich etwas vorstellen", "sich einbilden"],
+    "imagine": ["*sich etwas vorstellen", "sich einbilden","vostellen"],
     "life": ["*Leben", "Existenz"],
     "city": ["*Stadt", "*Großstadt", "Metropole"]
   }
