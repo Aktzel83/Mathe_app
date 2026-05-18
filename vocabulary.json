@@ -82,5 +82,43 @@
     "age": ["*Alter", "Lebensalter"],
     "also": ["*auch", "ebenfalls", "zudem"],
     "metre": ["*Meter"]
+  },
+  "Block_4": {
+    "on Saturday afternoon": ["*am Samstagnachmittag"],
+    "ride a bike": ["*Rad fahren", "Fahrrad fahren"],
+    "bike": ["*Fahrrad", "Rad"],
+    "stop": ["*anhalten", "*stoppen", "aufhören"],
+    "tired": ["*müde", "erschöpft"],
+    "be thirsty": ["*durstig sein", "*Durst haben"],
+    "chocolate": ["*Schokolade"],
+    "usually": ["*meistens", "*normalerweise", "*gewöhnlich", "in der Regel"],
+    "turn on": ["*etwas einschalten", "anmachen"],
+    "behind": ["*hinter", "dahinter"],
+    "in front of": ["*vor", "vorne"],
+    "turn around": ["*sich umdrehen", "umkehren"],
+    "ghost": ["*Geist", "*Gespenst", "Spuk"],
+    "ready": ["*bereit", "*fertig", "vorbereitet"],
+    "loud": ["*laut", "lautstark"],
+    "scary": ["*unheimlich", "*gruselig", "beängstigend"],
+    "traveller": ["*Reisende", "Reisender"],
+    "travel": ["*reisen", "verreisen"],
+    "part": ["*Teil", "Abschnitt", "Stück"],
+    "be called": ["*heißen", "*genannt werden"],
+    "museum": ["*Museum"],
+    "money": ["*Geld", "Währung"],
+    "child": ["*Kind", "Kleinkind"],
+    "ticket": ["*Eintrittskarte", "Fahrkarte", "Ticket"],
+    "pound": ["*Pfund"],
+    "imagine": ["*sich etwas vorstellen", "sich einbilden"],
+    "life": ["*Leben", "Existenz"],
+    "city": ["*Stadt", "*Großstadt", "Metropole"]
   }
 }
+
+
+
+
+
+
+
+
